@@ -1,0 +1,36 @@
+#include "mbed.h"
+#include "Sht31.h"
+
+Ticker Tensecond;
+
+DigitalOut whiteled(p5);
+
+PwmOut redled(p6);
+PwmOut blueled(p7);
+
+InterruptIn pushbutton(p8);
+
+Sht31 sht31(I2C_SDA, I2C_SCL);
+
+void reading_value(){
+    
+    float temp = sht31.readTemperature();
+    float humidity = sht31.readHumidity();
+    
+    redled = temp/50;
+    blueled = humidity/100;
+}
+
+
+int main() {
+ 
+    Tensecond.attach(&reading_value, 10.0);
+    pushbutton.fall(&reading_value);
+    
+    while(1){
+        whiteled = 1;
+        wait(0.5);
+        whiteled = 0;
+        wait(2);
+    }
+}
